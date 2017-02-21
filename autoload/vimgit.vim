@@ -32,6 +32,13 @@ function! vimgit#Status()
 endfunction
 
 function! vimgit#Log()
+    " open left side window
+    " check bufname
+    if bufname( "%" ) ==? __vimgit__
+        return
+    endif
+    " clear buf
+    " draw buf
 endfunction
 
 function! vimgit#Add( file )
@@ -49,17 +56,17 @@ endfunction
 function! vimgit#Diff( file )
     if bufexists( "__vimgit_diff__" ) > 0
         "normal! <CTRL>W w
-        wincmd h
+        execute bufwinnr("__vimgit_diff__")."wincmd w"
     else
-        vsplit __vimgit_diff__
+        vertical rightb split __vimgit_diff__
     endif
-    normal! ggdG
     setlocal buftype=nofile
     setlocal filetype=gitbuf_diff
     setlocal nofoldenable 
     let b:vimgit_diff_file = a:file
 
     set modifiable
+    normal! ggdG
     call append( 0, split( system( "git diff " . b:vimgit_diff_file ), '\v\n' ) )
     normal! gg
     set nomodifiable
@@ -72,6 +79,11 @@ function! vimgit#Push()
 endfunction
 
 function! vimgit#Pull()
+    set modifiable
+    normal! ggdG
+    call append( 0, split( system( "git pull" ), '\v\n' ) )
+    normal! gg
+    set nomodifiable
 endfunction
 
 function! vimgit#Stash()
